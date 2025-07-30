@@ -1,0 +1,9 @@
+{
+  "name": "nrg-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "npx http-server ./ -p 4200",
+    "test": "echo 'no tests'"
+  }
+}
