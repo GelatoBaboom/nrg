@@ -19,7 +19,7 @@ in the configuration file.
 Required environment variables for real data:
 
 - `WEATHER_API_KEY` – API key for the Google Weather service.
-- `TOURISM_API_KEY` – API key for the tourism service.
+- `NEWS_API_KEY` – API key for NewsAPI used to estimate tourist demand.
 
 Run manually:
 

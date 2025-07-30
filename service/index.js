@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { estimateTourists } from './tourism.js';
 
 /**
  * Fetch current weather data for the given city. When the OFFLINE
@@ -37,29 +38,6 @@ export async function fetchWeather(city) {
   };
 }
 
-/**
- * Fetch expected tourist amount for the given city. If OFFLINE is set,
- * the configured value is used instead.
- */
-export async function fetchTourists(city) {
-  if (process.env.OFFLINE) {
-    return city.expectedTourists;
-  }
-
-  if (!process.env.TOURISM_API_KEY) {
-    throw new Error('Missing TOURISM_API_KEY');
-  }
-
-  const url =
-    `https://tourism.example.com/api/visitors?city=${encodeURIComponent(city.name)}` +
-    `&key=${process.env.TOURISM_API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Tourism API error ${res.status}`);
-  }
-  const data = await res.json();
-  return data.expectedVisitors || city.expectedTourists;
-}
 
 export function estimateEnergy(city) {
   const base = city.population * 0.02;
@@ -80,7 +58,7 @@ export function loadCities() {
 
 export async function calculateCity(city) {
   const weather = await fetchWeather(city);
-  const expectedTourists = await fetchTourists(city);
+  const expectedTourists = await estimateTourists(city);
   const data = {
     ...city,
     ...weather,
