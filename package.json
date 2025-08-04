@@ -1,0 +1,11 @@
+{
+  "name": "nrg-app",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/server.js",
+    "test": "npm run test:service && npm run test:backend",
+    "test:service": "node service/test/test.js",
+    "test:backend": "node backend/test/test.js"
+  }
+}
