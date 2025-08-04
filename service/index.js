@@ -1,20 +1,16 @@
 import fs from 'fs';
 import { estimateTourists } from './tourism.js';
+import { estimateConsumption } from './consumption.js';
 
 /**
  * Fetch current weather data for the given city. When the OFFLINE
- * environment variable is set the values stored in the configuration
- * file are used instead of making a network request.
+ * environment variable is set the values are approximated using the
+ * current date instead of making a network request.
  */
 export async function fetchWeather(city) {
   if (process.env.OFFLINE) {
-    return {
-      temperature: city.temperature,
-      daylightHours: city.daylightHours,
-      raining: false,
-      snowing: false,
-      freezing: city.temperature <= 0
-    };
+    return seasonalWeather(city);
+
   }
 
   if (!process.env.WEATHER_API_KEY || !city.latitude || !city.longitude) {
@@ -30,25 +26,57 @@ export async function fetchWeather(city) {
   }
   const data = await res.json();
   return {
-    temperature: data.temperature || city.temperature,
-    daylightHours: data.daylightHours || city.daylightHours,
+    temperature: data.temperature ?? city.temperature ?? 20,
+    daylightHours: data.daylightHours ?? city.daylightHours ?? 12,
     raining: data.conditions?.includes('RAIN') || false,
     snowing: data.conditions?.includes('SNOW') || false,
     freezing: data.temperature <= 0
   };
 }
 
+function seasonalWeather(city) {
+  const month = new Date().getUTCMonth() + 1;
+  const south = city.latitude < 0;
+  let season;
+  if (south) {
+    if (month <= 2 || month === 12) season = 'summer';
+    else if (month <= 5) season = 'autumn';
+    else if (month <= 8) season = 'winter';
+    else season = 'spring';
+  } else {
+    if (month <= 2 || month === 12) season = 'winter';
+    else if (month <= 5) season = 'spring';
+    else if (month <= 8) season = 'summer';
+    else season = 'autumn';
+  }
+  const defaults = {
+    summer: { temperature: 25, daylightHours: 14 },
+    autumn: { temperature: 15, daylightHours: 11 },
+    winter: { temperature: 5, daylightHours: 9 },
+    spring: { temperature: 18, daylightHours: 12 }
+  };
+  const info = defaults[season];
+  return {
+    ...info,
+    raining: false,
+    snowing: false,
+    freezing: info.temperature <= 0
+  };
+}
+
 
 export function estimateEnergy(city) {
-  const base = city.population * 0.02;
-  const touristFactor = city.expectedTourists * 0.015;
-  const tempFactor = city.temperature > 22 ? 1.2 : 0.8;
-  const daylightFactor = city.daylightHours / 12;
-  let weatherFactor = 1;
-  if (city.raining || city.snowing || city.freezing) {
-    weatherFactor += 0.1;
+  let demand = city.baseConsumption;
+  demand *= 1 + (city.expectedTourists || 0) / (city.population || 1) * 0.3;
+  if (city.temperature > 25 || city.temperature < 5) {
+    demand *= 1.2;
   }
-  return (base + touristFactor) * tempFactor * daylightFactor * weatherFactor;
+  demand *= 12 / city.daylightHours;
+  if (city.raining || city.snowing || city.freezing) {
+    demand *= 1.1;
+  }
+  return Math.min(city.peakConsumption, Math.max(city.baseConsumption, demand));
+
 }
 
 export function loadCities() {
@@ -59,9 +87,11 @@ export function loadCities() {
 export async function calculateCity(city) {
   const weather = await fetchWeather(city);
   const expectedTourists = await estimateTourists(city);
+  const consumption = await estimateConsumption(city);
   const data = {
     ...city,
     ...weather,
+    ...consumption,
     expectedTourists
   };
   return {

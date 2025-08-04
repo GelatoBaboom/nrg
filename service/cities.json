@@ -5,8 +5,8 @@
     "expectedTourists": 8000,
     "latitude": -40.156231,
     "longitude": -71.34893,
-    "daylightHours": 12,
-    "temperature": 15
+    "baseConsumption": 30,
+    "peakConsumption": 60
   },
   {
     "name": "Buenos Aires",
@@ -14,7 +14,7 @@
     "expectedTourists": 50000,
     "latitude": -34.603722,
     "longitude": -58.381592,
-    "daylightHours": 10,
-    "temperature": 20
+    "baseConsumption": 1200,
+    "peakConsumption": 2500
   }
 ]
