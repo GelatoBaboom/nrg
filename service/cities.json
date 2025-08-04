@@ -1,0 +1,20 @@
+[
+  {
+    "name": "San Martín de los Andes",
+    "population": 29479,
+    "expectedTourists": 8000,
+    "latitude": -40.156231,
+    "longitude": -71.34893,
+    "baseConsumption": 30,
+    "peakConsumption": 60
+  },
+  {
+    "name": "Buenos Aires",
+    "population": 3054300,
+    "expectedTourists": 50000,
+    "latitude": -34.603722,
+    "longitude": -58.381592,
+    "baseConsumption": 1200,
+    "peakConsumption": 2500
+  }
+]

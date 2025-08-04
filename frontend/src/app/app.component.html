@@ -1,0 +1,17 @@
+<div class="container mt-4">
+  <h1>Consumo energético</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Ciudad</th>
+        <th>Energía esperada (MW)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of results">
+        <td>{{ r.name }}</td>
+        <td>{{ r.energy | number:'1.0-2' }} MW</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
