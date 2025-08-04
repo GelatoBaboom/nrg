@@ -10,6 +10,7 @@ import { estimateConsumption } from './consumption.js';
 export async function fetchWeather(city) {
   if (process.env.OFFLINE) {
     return seasonalWeather(city);
+
   }
 
   if (!process.env.WEATHER_API_KEY || !city.latitude || !city.longitude) {
@@ -75,6 +76,7 @@ export function estimateEnergy(city) {
     demand *= 1.1;
   }
   return Math.min(city.peakConsumption, Math.max(city.baseConsumption, demand));
+
 }
 
 export function loadCities() {
